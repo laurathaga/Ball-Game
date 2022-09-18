@@ -31,20 +31,16 @@ class Ball {
     }  
 
     update(barConfig) {
-        this.accX += this.dx;
-        this.accY += this.accY;
         this.y += this.dy;
         this.x += this.dx;
 
         if (this.x + this.radius >= cv.width || this.x - this.radius <= 0) {
             this.dx = -this.dx;
-            this.accX = -this.accX;
             this.isFinished = false;
         } 
         if (this.y + this.radius >= cv.height || this.y - this.radius <= 0) {
             this.isFinished = true;
             this.dy = -this.dy;
-            this.accY = -this.accY;
         }
         if (this.y + this.radius >= barConfig.y && 
             (this.x + this.radius >= barConfig.posX && this.x + this.radius <= barConfig.posX + barConfig.width)) {
@@ -93,4 +89,4 @@ window.addEventListener('keydown', evnt => {
     ball.update(bar);
     bar.update();
     requestAnimationFrame(animate);
-});
+})();
