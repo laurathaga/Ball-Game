@@ -1,9 +1,9 @@
 /** @type {HTMLCanvasElement} */
 const cv = document.querySelector('#canvas');
 const ctx = cv.getContext('2d');
-const PADDLE_WIDTH = 150;
+const PADDLE_WIDTH = 120;
 const PADDLE_THICKNESS = 10;
-const PADDLE_DIST_FROM_EDGE = 20;
+const PADDLE_DIST_FROM_EDGE = 30;
 
 const mouse = {
     x: null,
@@ -33,10 +33,7 @@ class Ball {
         this.dy = 5;
         this.accX = 0.02;
         this.accY = 0.02;
-        this.throwBall = {
-            left: null,
-            right: null,
-        };
+        this.disFromPaddleCenter;
     }
 
     draw() {
@@ -57,32 +54,19 @@ class Ball {
         this.y += this.dy;
         this.x += this.dx;
 
-        if (this.x + this.radius >= cv.width || this.x - this.radius <= 0) this.dx = -this.dx;
+        if (this.x + this.radius >= cv.width || this.x - this.radius <= 0) this.dx *= -1;
 
-        if (this.y - this.radius <= 0) this.dy = -this.dy;
+        if (this.y - this.radius <= 0) this.dy *= -1;
         
         if (this.y + this.radius >= cv.height) this.resetBallPositions();
 
-        if ((this.x + this.radius >= mouse.x - paddle.posX && this.x + this.radius <= mouse.x + paddle.posX) 
-            && (this.y + this.radius >= paddle.posY)) {
-            this.dy = -this.dy;
-        }
-
-        if (this.x + this.radius < mouse.x - paddle.posX) { // then the ball is coming from the left side of the paddle
-            this.throwBall.left = -1;
-            this.throwBall.right = 1;
-        } else if (this.x + this.radius > mouse.x + paddle.posX) { // then the ball is coming from the right side of the paddle
-            this.throwBall.right = -1;
-            this.throwBall.left = 1;
-        }
-
-        if ((this.x + this.radius > mouse.x - paddle.posX && this.x + this.radius < mouse.x)
-            && this.y + this.radius >= paddle.posY){
-            this.dx *= this.throwBall.left;
-        }
-        if ((this.x + this.radius > mouse.x && this.x + this.radius < mouse.x + paddle.posX)
-            && this.y + this.radius >= paddle.posY){
-            this.dx *= this.throwBall.right;
+        if (this.x > mouse.x - paddle.posX &&
+            this.x < mouse.x + paddle.posX && 
+            this.y > paddle.posY) {
+            this.dy *= -1;
+            let centreOfPaddleX = paddle.posX + PADDLE_WIDTH / 2;
+            this.disFromPaddleCenter = this.x - centreOfPaddleX;
+            this.dx = this.disFromPaddleCenter * 0.25;
         }
         
         this.draw();
@@ -95,17 +79,13 @@ class Paddle {
         this.height = height;
         this.color = color;
         this.posY = cv.height - PADDLE_DIST_FROM_EDGE;
-        this.posX = this.width / 2;
+        this.posX;
     }
 
     draw() {
+        this.posX = mouse.x - (this.width / 2);
         ctx.fillStyle = this.color;
-        ctx.fillRect(
-            (mouse.x ?? cv.width / 2) - this.posX,
-            this.posY,
-            this.width,
-            this.height
-        );
+        ctx.fillRect((this.posX ?? cv.width / 2),this.posY, this.width, this.height);
     }
 
     update() {
@@ -113,7 +93,7 @@ class Paddle {
     }
 }
 
-const ball = new Ball(100, 100, 10, 'purple');
+const ball = new Ball(70, 70, 10, 'white');
 const paddle = new Paddle(PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
 
 (function animate() {
