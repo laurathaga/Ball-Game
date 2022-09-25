@@ -4,6 +4,11 @@ const ctx = cv.getContext('2d');
 const PADDLE_WIDTH = 120;
 const PADDLE_THICKNESS = 10;
 const PADDLE_DIST_FROM_EDGE = 30;
+const B_COLS = 12;
+const BRICK_WIDTH = 100;
+const BRICK_HEIGHT = 40;
+const B_ROWS = 4;
+const brickGrid = new Array(B_COLS * B_ROWS);
 
 const mouse = {
     x: null,
@@ -20,7 +25,26 @@ window.addEventListener('resize', () => {
 
 const updateMousePosition = (evnt) => {
     mouse.x = evnt.pageX;
+    mouse.y = evnt.pageY;
 };
+
+const fillGrid = (array) => {
+    for(let i = 0; i < array.length; i++) {
+        Math.random() < 0.5 ? array[i] = true : array[i] = false;
+    }
+};
+
+const drawBrick = () => {
+    for(let rows = 0; rows < B_ROWS; rows++) {
+        for(let col = 0; col < B_COLS; col++) {
+            const eachBrickIndex = B_COLS * rows + col;
+            if(brickGrid[eachBrickIndex]) {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(BRICK_WIDTH * col, BRICK_HEIGHT * rows, BRICK_WIDTH - 2, BRICK_HEIGHT - 2);
+            }
+        }
+    }
+}
 
 cv.addEventListener('mousemove', updateMousePosition);
 class Ball {
@@ -60,11 +84,11 @@ class Ball {
         
         if (this.y + this.radius >= cv.height) this.resetBallPositions();
 
-        if (this.x > mouse.x - paddle.posX &&
-            this.x < mouse.x + paddle.posX && 
-            this.y > paddle.posY) {
+        if (this.x >= paddle.posX &&
+            this.x <= mouse.x + paddle.posX && 
+            this.y >= paddle.posY) {
             this.dy *= -1;
-            let centreOfPaddleX = paddle.posX + PADDLE_WIDTH / 2;
+            const centreOfPaddleX = paddle.posX + PADDLE_WIDTH / 2;
             this.disFromPaddleCenter = this.x - centreOfPaddleX;
             this.dx = this.disFromPaddleCenter * 0.25;
         }
@@ -79,7 +103,7 @@ class Paddle {
         this.height = height;
         this.color = color;
         this.posY = cv.height - PADDLE_DIST_FROM_EDGE;
-        this.posX;
+        this.posX = cv.width / 2;
     }
 
     draw() {
@@ -93,12 +117,17 @@ class Paddle {
     }
 }
 
-const ball = new Ball(70, 70, 10, 'white');
-const paddle = new Paddle(PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
 
-(function animate() {
-    ctx.clearRect(0, 0, cv.width, cv.height);
-    ball.update(paddle);
-    paddle.update();
-    requestAnimationFrame(animate);
-});
+window.onload = () => {
+    const ball = new Ball(70, 70, 10, 'white');
+    const paddle = new Paddle(PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
+    fillGrid(brickGrid);    
+    
+    (function animate() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        ball.update(paddle);
+        paddle.update();
+        drawBrick();
+        requestAnimationFrame(animate);
+    });
+};
