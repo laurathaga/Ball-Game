@@ -4,11 +4,11 @@ const ctx = cv.getContext('2d');
 const PADDLE_WIDTH = 120;
 const PADDLE_THICKNESS = 10;
 const PADDLE_DIST_FROM_EDGE = 30;
-const B_COLS = 12;
-const BRICK_WIDTH = 100;
-const BRICK_HEIGHT = 40;
-const B_ROWS = 4;
-const brickGrid = new Array(B_COLS * B_ROWS);
+const B_COLS = ~~(cv.width / 15);
+const BRICK_WIDTH = 80;
+const BRICK_HEIGHT = 20;
+const B_ROWS = 10;
+const brickGrid = new Array(B_COLS  * B_ROWS);
 
 const mouse = {
     x: null,
@@ -28,18 +28,20 @@ const updateMousePosition = (evnt) => {
     mouse.y = evnt.pageY;
 };
 
+const getEachBrickIndex = (col, row) => col + B_COLS * row;
+
 const fillGrid = (array) => {
     for(let i = 0; i < array.length; i++) {
-        Math.random() < 0.5 ? array[i] = true : array[i] = false;
+        array[i] = true
     }
 };
 
 const drawBrick = () => {
     for(let rows = 0; rows < B_ROWS; rows++) {
         for(let col = 0; col < B_COLS; col++) {
-            const eachBrickIndex = B_COLS * rows + col;
+            const eachBrickIndex = getEachBrickIndex(col, rows);
             if(brickGrid[eachBrickIndex]) {
-                ctx.fillStyle = 'white';
+                ctx.fillStyle = 'orangered';
                 ctx.fillRect(BRICK_WIDTH * col, BRICK_HEIGHT * rows, BRICK_WIDTH - 2, BRICK_HEIGHT - 2);
             }
         }
@@ -77,6 +79,9 @@ class Ball {
     update(paddle) {
         this.y += this.dy;
         this.x += this.dx;
+        const ballInsideCol = this.x / B_COLS;
+        const ballInsideRow = this.y / B_ROWS;
+        const ballInsideBrick = getEachBrickIndex(ballInsideCol, ballInsideRow);
 
         if (this.x + this.radius >= cv.width || this.x - this.radius <= 0) this.dx *= -1;
 
@@ -119,15 +124,22 @@ class Paddle {
 
 
 window.onload = () => {
-    const ball = new Ball(70, 70, 10, 'white');
+    const ball = new Ball(50, 50, 10, 'white');
     const paddle = new Paddle(PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
-    fillGrid(brickGrid);    
-    
+    fillGrid(brickGrid);
+
     (function animate() {
         ctx.clearRect(0, 0, cv.width, cv.height);
         ball.update(paddle);
         paddle.update();
         drawBrick();
+        const mouseX = mouse.x / B_COLS;
+        const mouseY = mouse.y / B_ROWS;
+        const x = getEachBrickIndex(mouseX, mouseY);
+
+        if (x >= 0 && x < B_COLS * B_ROWS) {
+            brickGrid[x] = false;
+        }
         requestAnimationFrame(animate);
     });
 };
