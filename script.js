@@ -133,13 +133,6 @@ window.onload = () => {
         ball.update(paddle);
         paddle.update();
         drawBrick();
-        const mouseX = mouse.x / B_COLS;
-        const mouseY = mouse.y / B_ROWS;
-        const x = getEachBrickIndex(mouseX, mouseY);
-
-        if (x >= 0 && x < B_COLS * B_ROWS) {
-            brickGrid[x] = false;
-        }
         requestAnimationFrame(animate);
-    });
+    })();
 };
