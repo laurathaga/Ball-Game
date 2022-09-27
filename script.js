@@ -4,7 +4,7 @@ const ctx = cv.getContext('2d');
 const PADDLE_WIDTH = 120;
 const PADDLE_THICKNESS = 10;
 const PADDLE_DIST_FROM_EDGE = 30;
-const B_COLS = ~~(cv.width / 15);
+const B_COLS = Math.abs(cv.width / 15);
 const BRICK_WIDTH = 80;
 const BRICK_HEIGHT = 20;
 const B_ROWS = 10;
@@ -55,10 +55,8 @@ class Ball {
         this.y = y;
         this.radius = radius;
         this.color = color;
-        this.dx = 5;
-        this.dy = 5;
-        this.accX = 0.02;
-        this.accY = 0.02;
+        this.dx = 2;
+        this.dy = 2;
         this.disFromPaddleCenter;
     }
 
@@ -71,7 +69,7 @@ class Ball {
     }
 
     resetBallPositions() {
-        window.alert('You lost bitch');
+        window.alert('You lost');
         this.x = 100;
         this.y = 100;
     }
@@ -79,15 +77,20 @@ class Ball {
     update(paddle) {
         this.y += this.dy;
         this.x += this.dx;
-        const ballInsideCol = this.x / B_COLS;
-        const ballInsideRow = this.y / B_ROWS;
+        const ballInsideCol = Math.floor(this.x / BRICK_WIDTH);
+        const ballInsideRow = Math.floor(this.y / BRICK_HEIGHT);
         const ballInsideBrick = getEachBrickIndex(ballInsideCol, ballInsideRow);
+        
 
         if (this.x + this.radius >= cv.width || this.x - this.radius <= 0) this.dx *= -1;
 
         if (this.y - this.radius <= 0) this.dy *= -1;
         
         if (this.y + this.radius >= cv.height) this.resetBallPositions();
+
+        if (ballInsideBrick >= 0 && ballInsideBrick < B_COLS * B_ROWS) {
+            brickGrid[ballInsideBrick] = false;
+        }
 
         if (this.x >= paddle.posX &&
             this.x <= mouse.x + paddle.posX && 
@@ -97,7 +100,7 @@ class Ball {
             this.disFromPaddleCenter = this.x - centreOfPaddleX;
             this.dx = this.disFromPaddleCenter * 0.25;
         }
-        
+
         this.draw();
     }
 };
@@ -122,7 +125,6 @@ class Paddle {
     }
 }
 
-
 window.onload = () => {
     const ball = new Ball(50, 50, 10, 'white');
     const paddle = new Paddle(PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
@@ -134,5 +136,5 @@ window.onload = () => {
         paddle.update();
         drawBrick();
         requestAnimationFrame(animate);
-    })();
+    });
 };

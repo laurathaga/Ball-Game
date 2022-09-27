@@ -1,0 +1,22 @@
+{
+  "name": "ball-game",
+  "version": "1.0.0",
+  "description": "## Table of Contents * [General info] (#general-info) * [Technologies] (#technologies) * [Setup] (#setup) * [Gameplay] (#gameplay)  ## General info  This is a simple 2 dimensional (2d) only game. It's similar to the breakout type of games.",
+  "main": "Ball.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laurathaga/Ball-Game.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laurathaga/Ball-Game/issues"
+  },
+  "homepage": "https://github.com/laurathaga/Ball-Game#readme",
+  "devDependencies": {
+    "rollup": "^2.79.1"
+  }
+}
