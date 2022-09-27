@@ -56,8 +56,8 @@ class Ball {
         this.y = y;
         this.radius = radius;
         this.color = color;
-        this.dx = 1;
-        this.dy = 1;
+        this.dx = 3;
+        this.dy = 3;
         this.disFromPaddleCenter;
     }
 
@@ -89,8 +89,11 @@ class Ball {
         
         if (this.y + this.radius >= cv.height) this.resetBallPositions();
 
-        if (ballInsideBrick >= 0 && ballInsideBrick < B_COLS * B_ROWS) {
-            brickGrid[ballInsideBrick] = false;
+        if ((ballInsideCol >= 0 && ballInsideCol < B_COLS) && (ballInsideRow >= 0 && ballInsideRow < B_ROWS)) {
+            if (brickGrid[ballInsideBrick]) {
+                brickGrid[ballInsideBrick] = false;
+                this.dy *= -1;
+            }
         }
 
         if (this.x >= paddle.posX &&
