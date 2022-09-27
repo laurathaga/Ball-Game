@@ -4,10 +4,11 @@ const ctx = cv.getContext('2d');
 const PADDLE_WIDTH = 120;
 const PADDLE_THICKNESS = 10;
 const PADDLE_DIST_FROM_EDGE = 30;
-const B_COLS = Math.abs(cv.width / 15);
+const B_COLS = 24;
 const BRICK_WIDTH = 80;
 const BRICK_HEIGHT = 20;
 const B_ROWS = 10;
+const GAP = 3;
 const brickGrid = new Array(B_COLS  * B_ROWS);
 
 const mouse = {
@@ -42,7 +43,7 @@ const drawBrick = () => {
             const eachBrickIndex = getEachBrickIndex(col, rows);
             if(brickGrid[eachBrickIndex]) {
                 ctx.fillStyle = 'orangered';
-                ctx.fillRect(BRICK_WIDTH * col, BRICK_HEIGHT * rows, BRICK_WIDTH - 2, BRICK_HEIGHT - 2);
+                ctx.fillRect(BRICK_WIDTH * col, BRICK_HEIGHT * rows, BRICK_WIDTH - GAP, BRICK_HEIGHT - GAP);
             }
         }
     }
@@ -55,8 +56,8 @@ class Ball {
         this.y = y;
         this.radius = radius;
         this.color = color;
-        this.dx = 2;
-        this.dy = 2;
+        this.dx = 1;
+        this.dy = 1;
         this.disFromPaddleCenter;
     }
 
@@ -93,7 +94,7 @@ class Ball {
         }
 
         if (this.x >= paddle.posX &&
-            this.x <= mouse.x + paddle.posX && 
+            this.x <= mouse.x + PADDLE_WIDTH / 2 && 
             this.y >= paddle.posY) {
             this.dy *= -1;
             const centreOfPaddleX = paddle.posX + PADDLE_WIDTH / 2;
