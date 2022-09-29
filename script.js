@@ -6,7 +6,7 @@ const PADDLE_THICKNESS = 10;
 const PADDLE_DIST_FROM_EDGE = 30;
 const B_COLS = 24;
 const BRICK_WIDTH = 80;
-const BRICK_HEIGHT = 20;
+const BRICK_HEIGHT = 30;
 const B_ROWS = 10;
 const GAP = 3;
 const brickGrid = new Array(B_COLS  * B_ROWS);
@@ -90,9 +90,22 @@ class Ball {
         if (this.y + this.radius >= cv.height) this.resetBallPositions();
 
         if ((ballInsideCol >= 0 && ballInsideCol < B_COLS) && (ballInsideRow >= 0 && ballInsideRow < B_ROWS)) {
+            const prevBallPosX = this.x - this.dx;
+            const prevBallPosY = this.y - this.dy;
+            const prevBrickCol = Math.floor(prevBallPosX / BRICK_WIDTH);
+            const prevBrickRow = Math.floor(prevBallPosY / BRICK_HEIGHT);
+
             if (brickGrid[ballInsideBrick]) {
                 brickGrid[ballInsideBrick] = false;
-                this.dy *= -1;
+
+                if (prevBallPosX != prevBrickCol) {
+                    const adjBrickCol = getEachBrickIndex(prevBrickCol, ballInsideRow);
+                    if(!brickGrid[adjBrickCol]) this.dx *= -1;
+                }
+                if (prevBallPosY != prevBrickRow) {
+                    const adjBrickRow = getEachBrickIndex(ballInsideRow, prevBrickRow);
+                    if (!brickGrid[adjBrickRow]) this.dy *= -1;
+                }
             }
         }
 
