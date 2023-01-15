@@ -153,5 +153,5 @@ window.onload = () => {
         paddle.update();
         drawBrick();
         requestAnimationFrame(animate);
-    });
+    })();
 };
